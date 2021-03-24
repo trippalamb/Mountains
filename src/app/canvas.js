@@ -60,7 +60,8 @@ class MountainRange{
         
         for(let i = 0; i<=this.n;i++){
             let dx = this.width/(this.n-1);
-            let x = (i === 0 || i === this.n) ? (dx*i) : (dx*i) + (dx*this.lateralVariation);
+            let dlv = dx * (Math.random()-0.5) * 2 * this.lateralVariation;
+            let x = (i === 0 || i === this.n) ? (dx*i) : (dx*i) + dlv;
             let y = sign*Math.random()*this.maxDeltaY + this.baseY;
             sign*=-1;
             this.points.push({x:x,y:y});
@@ -78,7 +79,8 @@ class Canvas{
         //canvas config
         this.width = 400;
         this.height = 600;
-        this.colors = ["#ede6d6", "#f9c792", "#85aeaa", "#388199", "#323232"]
+        //this.colors = ["#ede6d6", "#f9c792", "#85aeaa", "#388199", "#323232"]
+        this.colors = generateRandomColors();
 
         //sun config
         this.radius = [80, 160];
@@ -87,7 +89,7 @@ class Canvas{
         //mountains config
         this.ys = [300, 400, 500];
         this.maxDeltaYs = [120,40,40]
-        this.latVar = [0.4, 0.2, 0.2];
+        this.latVar = [0.4, 0.4, 0.4];
         this.nPoints = [[1, 1],[3, 3],[3, 3]];
         this.nSubdiv = [[0, 0],[0, 0],[0, 0]];
 
@@ -138,5 +140,58 @@ class Canvas{
         }
     }
 
+}
+
+function generateOGColors(){
+    let colors = [];
+    colors.push(hslToHex(34, 0.50, 0.90))
+    colors.push(hslToHex(34, 0.85, 0.75))
+    colors.push(hslToHex(184, 0.20, 0.60))
+    colors.push(hslToHex(194, 0.45, 0.40))
+    colors.push(hslToHex(184, 0.20, 0.20))
+
+    return colors;
+}
+
+function generateOGRandomColors(){
+
+    let hue = Math.ceil(Math.random()*360);
+
+    let colors = [];
+    colors.push(hslToHex(hue, 0.50, 0.90))
+    colors.push(hslToHex(hue, 0.85, 0.75))
+    colors.push(hslToHex((hue+150)%360, 0.20, 0.60))
+    colors.push(hslToHex((hue+160)%360, 0.45, 0.40))
+    colors.push(hslToHex((hue+150)%360, 0.20, 0.20))
+
+    return colors;
+}
+
+function generateRandomColors(){
+
+    let hue1 = Math.ceil(Math.random()*360);
+    let hue2 = 0;
+    do {hue2 = Math.ceil(Math.random()*360)} while(Math.abs(hue2-hue1) < 60) ;
+
+    let colors = [];
+    colors.push(hslToHex(hue1, 0.50, 0.90))
+    colors.push(hslToHex(hue1, 0.85, 0.75))
+    colors.push(hslToHex(hue2, 0.20, 0.60))
+    colors.push(hslToHex(hue2+10, 0.45, 0.40))
+    colors.push(hslToHex(hue2, 0.20, 0.20))
+
+    return colors;
+}
+
+function hslToHex(h, s, l) {
+//  l /= 100;
+  //const a = s * Math.min(l, 1 - l) / 100;
+  const a = s * Math.min(l, 1 - l);
+  const f = n => {
+    const k = (n + h / 30) % 12;
+    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    return Math.round(255 * color).toString(16).padStart(2, '0');   // convert to Hex and prefix "0" if needed
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
 }
 
