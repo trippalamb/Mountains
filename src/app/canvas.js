@@ -18,17 +18,20 @@ class Sun{
 }
 
 class MountainRange{
-    constructor(color, width, baseY, maxDeltaY, lateralVariation, minPoints, maxPoints, minSubdiv, maxSubdiv){
+    constructor(color, width, xMargin, baseY, minDeltaY, maxDeltaY, lateralVariation, minPoints, maxPoints, minSubdiv, maxSubdiv){
         this.color = color;
         this.width = width;
+        this.xMargin = xMargin;
         this.baseY = baseY;
+        this.minDeltaY = minDeltaY;
         this.maxDeltaY = maxDeltaY;
         this.lateralVariation = lateralVariation;
+        this.verticalVariation = lateralVariation*1.5;
         this.minPoints = minPoints;
         this.maxPoints = maxPoints;
         this.dp = maxPoints - minPoints;
         this.n = Math.ceil(Math.random() * this.dp) + minPoints + 2;
-        this.minSubdic = minSubdiv;
+        this.minSubdiv = minSubdiv;
         this.maxSubdiv = maxSubdiv;
 
         this.buildRange();
@@ -55,18 +58,46 @@ class MountainRange{
 
     buildRange(){
 
-        this.points = [];
+        let points = [];
         let sign = Math.sign(Math.random()-0.5);
         
-        for(let i = 0; i<=this.n;i++){
-            let dx = this.width/(this.n-1);
+        for(let i = 0; i<this.n;i++){
+            let dx = (this.width + (this.xMargin*2))/(this.n-1);
             let dlv = dx * (Math.random()-0.5) * 2 * this.lateralVariation;
-            let x = (i === 0 || i === this.n) ? (dx*i) : (dx*i) + dlv;
-            let y = sign*Math.random()*this.maxDeltaY + this.baseY;
+            let x = (i === 0 || i === (this.n-1)) ? (dx*i) : (dx*i) + dlv;
+            x -= this.xMargin;
+            let dy = this.maxDeltaY - this.minDeltaY;
+            let y = sign*(Math.random()*dy + this.minDeltaY) + this.baseY ;
             sign*=-1;
-            this.points.push({x:x,y:y});
+            points.push({x:x,y:y});
         }
 
+
+        this.points = [];
+        this.points.push(points[0]);
+        for(let i = 1; i < points.length; i++){
+
+            let dn = this.maxSubdiv - this.minSubdiv;
+            let n = Math.floor(Math.random()*dn) + this.minSubdiv;
+            
+            for(let j = 0; j < n ; j++){
+
+                let width = points[i].x - points[i-1].x;
+                let dx = width/(n+1);
+                let dlv = dx * (Math.random()-0.5) * 2 * this.lateralVariation;
+                let x = (dx*(j+1)) + dlv + points[i-1].x;
+
+                let height = points[i].y - points[i-1].y;
+                let dy = height/(n+1);
+                let dvv = dy * (Math.random()-0.5) * 2 * this.verticalVariation;
+                let y = (dy*(j+1)) + dvv + points[i-1].y;
+                
+                this.points.push({x:x,y:y});
+                
+            }
+
+            this.points.push(points[i]);
+        }
 
     }
 }
@@ -81,17 +112,20 @@ class Canvas{
         this.height = 600;
         //this.colors = ["#ede6d6", "#f9c792", "#85aeaa", "#388199", "#323232"]
         this.colors = generateRandomColors();
+        //this.colors = generateOGColors();
 
         //sun config
-        this.radius = [80, 160];
+        this.radius = [80, 130];
         this.sunAllowable = 0.6;
 
         //mountains config
-        this.ys = [300, 400, 500];
-        this.maxDeltaYs = [120,40,40]
-        this.latVar = [0.4, 0.4, 0.4];
-        this.nPoints = [[1, 1],[3, 3],[3, 3]];
-        this.nSubdiv = [[0, 0],[0, 0],[0, 0]];
+        this.ys = [300, 375, 500];
+        this.minDeltaYs = [50,20,20];
+        this.maxDeltaYs = [120,40,50];
+        this.xMargin = 80;
+        this.latVar = [0.5, 0.3, 0.3];
+        this.nPoints = [[1, 1],[3, 3],[4, 4]];
+        this.nSubdiv = [[3, 4],[2, 2],[1, 2]];
 
 
         //initialize pieces
@@ -111,7 +145,9 @@ class Canvas{
             this.mountains.push(new MountainRange(
                 this.colors[i+2], 
                 this.width, 
+                this.xMargin,
                 this.ys[i], 
+                this.minDeltaYs[i],
                 this.maxDeltaYs[i],
                 this.latVar[i],
                 this.nPoints[i][0], 
@@ -184,8 +220,6 @@ function generateRandomColors(){
 }
 
 function hslToHex(h, s, l) {
-//  l /= 100;
-  //const a = s * Math.min(l, 1 - l) / 100;
   const a = s * Math.min(l, 1 - l);
   const f = n => {
     const k = (n + h / 30) % 12;
