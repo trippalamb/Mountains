@@ -108,25 +108,13 @@ class Canvas{
     constructor(){
 
         //canvas config
-        this.width = 400;
-        this.height = 600;
-        //this.colors = ["#ede6d6", "#f9c792", "#85aeaa", "#388199", "#323232"]
-        this.colors = generateRandomColors();
-        //this.colors = generateOGColors();
+        let h = $("#background").height()*0.7;
+        this.height = h;
+        this.width = 0.66 * h;
 
-        //sun config
-        this.radius = [80, 130];
-        this.sunAllowable = 0.6;
+       
 
-        //mountains config
-        this.ys = [300, 375, 500];
-        this.minDeltaYs = [50,20,20];
-        this.maxDeltaYs = [120,40,50];
-        this.xMargin = 80;
-        this.latVar = [0.5, 0.3, 0.3];
-        this.nPoints = [[1, 1],[3, 3],[4, 4]];
-        this.nSubdiv = [[3, 4],[2, 2],[1, 2]];
-
+        this.setConfig(h);
 
         //initialize pieces
         this.sun = new Sun(
@@ -160,20 +148,53 @@ class Canvas{
         //init d3
         this.svg = d3.select("#canvas")
             .append("svg")
+            .style("width", this.width + 'px')
+            .style("height", this.height + 'px')
             .attr("viewBox", [0, 0, this.width, this.height]);
+
+        $("#canvas")
+            .width(this.width)
+            .height(this.height);
+
+        $("#canvas-container").width(this.width+12);
 
     }
 
     draw(){
+
         this.svg.append("rect")
-            .attr("width", "100%")
-            .attr("height", "100%")
+            .attr("width", this.width)
+            .attr("height", this.height)
             .attr("fill", this.colors[0]);
 
         this.sun.draw(this.svg);
         for(let i = 0; i < this.mountains.length; i++){
             this.mountains[i].draw(this.svg, this.height);
         }
+
+    }
+
+    setConfig(h) {
+        //this.colors = ["#ede6d6", "#f9c792", "#85aeaa", "#388199", "#323232"]
+        this.colors = generateRandomColors();
+        //this.colors = generateOGColors();
+
+        //sun config
+        this.radius = [0.13, 0.22].map( a => a*h);
+        this.sunAllowable = 0.6;
+
+        //mountains config
+        this.ys = [0.5, 0.625, 0.833].map(a => a * h);
+        this.minDeltaYs = [0.0833 , 0.0333, 0.0333].map(a => a * h);
+        this.maxDeltaYs = [0.2, 0.0666, 0.0833].map(a => a * h);
+        this.xMargin = 0.13 * h;
+        this.latVar = [0.5, 0.3, 0.3];
+        this.nPoints = [[1, 1], [3, 3], [4, 4]];
+        this.nSubdiv = [[3, 4], [2, 2], [1, 2]];
+    }
+
+    delete() {
+        this.svg.remove();
     }
 
 }
