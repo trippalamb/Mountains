@@ -12,19 +12,22 @@ html, body {
     overflow-y: scroll;
 }
 
-#name-header {
+.data_70 {
     margin-top: 0px;
     font-family: 'data_70regular';
 }
 
 #link-index {
-    font-size: 2em;
+    font-size: 2.0em;
     color: #93a1a1;
     transition: 0.4s;
+}
+
+.no-underline{
     text-decoration: none;
 }
 
-#link-index:hover {
+#link-index a:hover {
     color: #b58900;
 }
 
@@ -103,7 +106,7 @@ a:hover {
 
 @font-face {
     font-family: 'data_70regular';
-    src: url('../fonts/Data70-webfontkit/data_70_regular-webfont.woff2') format('woff2'), url('../fonts/Data70-webfontkit/data_70_regular-webfont.woff') format('woff');
+    src: url('./src/fonts/Data70-webfontkit/data_70_regular-webfont.woff2') format('woff2'), url('../fonts/Data70-webfontkit/data_70_regular-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
